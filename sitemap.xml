@@ -10,42 +10,49 @@
   
   <url>
     <loc>http://ak213.github.io/categories/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/categories/language/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/tags/lua/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/post/lua/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/post/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>http://ak213.github.io/tags/</loc>
+    <lastmod>2022-10-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
