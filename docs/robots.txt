@@ -1,2 +1,0 @@
-User-agent: *
-Sitemap: http://ak213.github.io/sitemap.xml

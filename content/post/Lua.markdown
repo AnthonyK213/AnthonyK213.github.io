@@ -308,3 +308,4 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
 * 位运算
   - 由于Lua(5.1)本身只有`number(double)`类型, 所以原生是不支持整型的位运算的,
     但可借助LuaJIT的位运算扩展库[BitOp](https://bitop.luajit.org/)
+* `async/await`实现 - coroutine + libuv(vim.loop)
