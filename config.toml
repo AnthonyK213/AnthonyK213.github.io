@@ -184,7 +184,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   [params.social]                                         # 社交链接
     a-email = "mailto:your@email.com"
     b-stack-overflow = "http://localhost:1313"
-    g-github = "http://localhost:1313"
+    g-github = "https://github.com/AnthonyK213/"
 
 # See https://gohugo.io/about/hugo-and-gdpr/
 [privacy]
