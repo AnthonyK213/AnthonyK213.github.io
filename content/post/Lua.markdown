@@ -281,6 +281,7 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
 
     local Vector3d = ffi.metatype("Vector3d", mt)
     ```
+* 内存管理
 * Lua与C语法对应关系
 
 | Idiom                      | C code        | Lua code     |
