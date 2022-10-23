@@ -29,7 +29,7 @@ toc: false
 # 基本使用
 | Method              | Description                                            |
 |---------------------|--------------------------------------------------------|
-| coroutine.create()  | 创建协程, 接收一个函数返回`thread`对象，用`resume`唤醒 |
+| coroutine.create()  | 创建协程, 接收一个函数并返回`thread`对象，`resume`唤醒 |
 | coroutine.resume()  | 重启协程, 和`create`配合使用                           |
 | coroutine.yield()   | 挂起协程, 将协程设置为挂起状态，和`resume`配合使用     |
 | coroutine.status()  | 查看协程的状态(`normal`, `dead`, `suspend`, `running`) |
