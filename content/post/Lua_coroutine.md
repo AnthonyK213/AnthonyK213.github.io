@@ -27,14 +27,14 @@ toc: false
 
 
 # 基本使用
-| Method              | Description                                              |
-|---------------------|----------------------------------------------------------|
-| coroutine.create()  | 创建协程, 返回`thread`对象，参数为一个函数，`resume`唤醒 |
-| coroutine.resume()  | 重启协程, 和`create`配合使用                             |
-| coroutine.yield()   | 挂起协程, 将协程设置为挂起状态，和`resume`配合使用       |
-| coroutine.status()  | 查看协程的状态(normal, dead, suspend, running)           |
-| coroutine.wrap()    | 创建协程, 返回一个函数，调用此函数即进入这个`coroutine`  |
-| coroutine.running() | 用来判断当前执行的协程是不是主线程，如果是，则返回`true` |
+| Method              | Description                                            |
+|---------------------|--------------------------------------------------------|
+| coroutine.create()  | 创建协程, 接收一个函数返回`thread`对象，用`resume`唤醒 |
+| coroutine.resume()  | 重启协程, 和`create`配合使用                           |
+| coroutine.yield()   | 挂起协程, 将协程设置为挂起状态，和`resume`配合使用     |
+| coroutine.status()  | 查看协程的状态(`normal`, `dead`, `suspend`, `running`) |
+| coroutine.wrap()    | 创建协程, 返回一个函数，调用此函数即进入此`coroutine`  |
+| coroutine.running() | 返回当前协程与一个布尔值(若协程为主协程则为`true`)     |
 
 * 如果协程`co`的函数执行完毕，协程正常终止，`resume`返回`true`和函数返回值;  
   如果协程`co`的函数执行过程中，协程让出了(调用了`yield`方法)，那么`resume`返回`true`
@@ -43,7 +43,7 @@ toc: false
   > `create`是在保护模式下进行的，`wrap`不是
 * 传递给`yield`的参数会作为`resume`的额外返回值
 * 如果对该协程不是第一次执行`resume`, `resume`函数传入的参数将会作为`yield`的返回值
-* 例： 生产者-消费者模式
+* 例： **生产者-消费者** 模式
   ``` lua
   local producer = coroutine.create(function ()
       for i = 1, 10 do
