@@ -69,7 +69,7 @@ toc: false
 
 # `async`/`await`
 使用`coroutine`与`libuv(vim.loop)`
-[实现](https://github.com/AnthonyK213/nvim/blob/master/lua/utility/task.lua)
+[实现](https://github.com/AnthonyK213/nvim/blob/master/lua/futures/task.lua)
 ``` lua
 ---@class 任务 任务对象.
 ---@field action function 需要异步执行的函数.
