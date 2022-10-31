@@ -79,21 +79,38 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
   ```
 
 ## Lua与C语法对应关系
-| Idiom                      | C code        | Lua code     |
-|----------------------------|---------------|--------------|
-| Pointer dereference        | x = \*p       | x = p[0]     |
-| int \*p                    | \*p = y       | p[0] = y     |
-| Pointer indexing           | x = p[i]      | x = p[i]     |
-| int i, \*p                 | p[i+1] = y    | p[i+1] = y   |
-| Array indexing             | x = a[i]      | x = a[i]     |
-| int i, a[]                 | a[i+1] = y    | a[i+1] = y   |
-| struct/union dereference   | x = s.field   | x = s.field  |
-| struct foo s               | s.field = y   | s.field = y  |
-| struct/union pointer deref | x = sp->field | x = sp.field |
-| struct foo \*sp            | sp->field = y | s.field = y  |
-| int i, \*p                 | y = p - i     | y = p - i    |
-| Pointer dereference        | x = p1 - p2   | x = p1 - p2  |
-| Array element pointer      | x = &a[i]     | x = a + i    |
+[ext_ffi_tutorial](https://luajit.org/ext_ffi_tutorial.html)
+| Idiom                                                | C code                                   | Lua code                                                     |
+|------------------------------------------------------|------------------------------------------|--------------------------------------------------------------|
+| Pointer dereference<br/>int \*p;                     | x = \*p;<br\>\*p = y;                    | x = p[0]<br/>p[0] = y                                        |
+| Pointer indexing<br/>int i, \*p;                     | x = p[i];<br/>p[i+1] = y;                | x = p[i]<br/>p[i+1] = y                                      |
+| Array indexing<br/>int i, a[];                       | x = a[i];<br/>a[i+1] = y;                | x = a[i]<br/>a[i+1] = y                                      |
+| struct/union dereference<br/>struct foo s;           | x = s.field;<br/>s.field = y;            | x = s.field<br/>s.field = y                                  |
+| struct/union pointer deref<br/>struct foo \*sp;      | x = sp-\>field;<br/>sp-\>field = y;      | x = sp.field<br/>s.field = y                                 |
+| Pointer arithmetic<br/>int i, \*p;                   | x = p + i;<br/>y = p - i;                | x = p + i<br/>y = p - i                                      |
+| Pointer dereference<br/>int \*p1, \*p2;              | x = p1 - p2;                             | x = p1 - p2                                                  |
+| Array element pointer<br/>int i, a[];                | x = &a[i];                               | x = a + i                                                    |
+| Cast pointer to address<br/>int \*p;                 | x = (intptr_t)p;                         | x = tonumber(ffi.cast("intptr_t", p))                        |
+| Functions with outargs<br/>void foo(int \*inoutlen); | int len = x;<br/>foo(&len);<br/>y = len; | local len = ffi.new("int[1]", x)<br/>foo(len)<br/>y = len[0] |
+| Vararg conversions<br/>int printf(char \*fmt, ...);  | printf("%g", 1.0);<br/>printf("%d", 1);  | printf("%g", 1)<br/>printf("%d", ffi.new("int"), 1)          |
 
 ## 内存管理
-TODO
+`cdata = ffi.gc(cdata, finalizer)`
+- 将终结器(`finalizer`)与指针或集合体(`cdata`)关联.
+- 原封不动返回`cdata`.
+- 这个函数允许将未托管的资源纳入LuaJIT垃圾收集器的自动内存管理中.
+- 使用例:
+  ``` lua
+  local p = ffi.gc(ffi.C.malloc(n), ffi.C.free)
+  -- ...
+  p = nil  -- p最后的引用被释放
+  -- GC最终会运行终结器: ffi.C.free(p)
+  ```
+- `cdata`终结器与`userdata`对象的`__gc`元方法工作方式相像:
+  当`cdata`对象的最后一个引用被释放时，相关联的终结器会被调用，并以`cdata`
+  对象作为传入实参。终结器可以是一个Lua函数、一个`cdata`函数抑或一个`cdata`
+  函数指针。一个已经存在的终结器可以通过设为`nil`来移除，例如在显示释放资源
+  之前:
+  ``` lua
+  ffi.C.free(ffi.gc(p, nil))  -- 手动释放内存
+  ```
