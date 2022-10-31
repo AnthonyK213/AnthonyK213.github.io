@@ -1,7 +1,7 @@
 ---
 title: "Lua: LuaJIT"
 date: 2022-10-20
-lastmod: 2022-10-23
+lastmod: 2022-10-31
 draft: false
 tags: ["Lua", "LuaJIT"]
 categories: ["Language"]
@@ -98,7 +98,7 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
 `cdata = ffi.gc(cdata, finalizer)`
 - 将终结器(`finalizer`)与指针或集合体(`cdata`)关联.
 - 原封不动返回`cdata`.
-- 这个函数允许将未托管的资源纳入LuaJIT垃圾收集器的自动内存管理中.
+- 此函数允许将未托管的资源纳入LuaJIT垃圾收集器的自动内存管理中.
 - 使用例:
   ``` lua
   local p = ffi.gc(ffi.C.malloc(n), ffi.C.free)
@@ -108,9 +108,8 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
   ```
 - `cdata`终结器与`userdata`对象的`__gc`元方法工作方式相像:
   当`cdata`对象的最后一个引用被释放时，相关联的终结器会被调用，并以`cdata`
-  对象作为传入实参。终结器可以是一个Lua函数、一个`cdata`函数抑或一个`cdata`
-  函数指针。一个已经存在的终结器可以通过设为`nil`来移除，例如在显示释放资源
-  之前:
+  对象作为传入实参。终结器可以是一个Lua函数、`cdata`函数抑或`cdata` 函数指针。
+  一个已经存在的终结器可以通过设为`nil`来移除，例如在显式释放资源之前:
   ``` lua
   ffi.C.free(ffi.gc(p, nil))  -- 手动释放内存
   ```
