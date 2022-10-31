@@ -34,7 +34,7 @@ toc: false
 | coroutine.yield()   | 挂起协程, 将协程设置为挂起状态，和`resume`配合使用     |
 | coroutine.status()  | 查看协程的状态(`normal`, `dead`, `suspend`, `running`) |
 | coroutine.wrap()    | 创建协程, 返回一个函数，调用此函数即进入此`coroutine`  |
-| coroutine.running() | 返回当前协程与一个布尔值(若协程为主协程则为`true`)     |
+| coroutine.running() | 返回当前协程, 若当前为主协程则返回`nil`                |
 
 * 如果协程`co`的函数执行完毕，协程正常终止，`resume`返回`true`和函数返回值;  
   如果协程`co`的函数执行过程中，协程让出了(调用了`yield`方法)，那么`resume`返回`true`
@@ -118,20 +118,20 @@ end
 ---@return any result 任务运行结果.
 function Task:await()
     local _co = coroutine.running()   -- 获取正在运行(将要创建新线程)的协程.
-                                      -- 归还线程池时唤醒此协程.
+                                      -- 归还线程池时唤醒此协程. 记为协程a
     if not _co or coroutine.status(_co) == "dead" then
         error("Task must await in an alive async block.")  -- 协程需要有效.
     end
     if self.status == "Created" then
         self:append_cb(function(r)           -- 为任务添加回调函数, 在结束时
             self.result = r                  -- 将结果赋予result字段, 并切回
-            self.status = "RanToCompletion"  -- 主协程, 继续执行主协程代码.
+            self.status = "RanToCompletion"  -- 协程a, 继续执行协程a代码.
             coroutine.resume(_co)
         end)
         if self:start() then                 -- 启动任务, 并挂起当前协程, 当前
             self.status = "Running"          -- 任务让出对主线程的占用并在其它
-            coroutine.yield()                -- 线程运行. 主协程等待任务完成时
-            return self.result               -- 回调函数重新运行主协程.
+            coroutine.yield()                -- 线程运行. 任务完成时回调函数重
+            return self.result               -- 新启动协程a.
         end
     end
 end
