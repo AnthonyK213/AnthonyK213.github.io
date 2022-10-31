@@ -117,7 +117,8 @@ end
 ---等待任务完成.
 ---@return any result 任务运行结果.
 function Task:await()
-    local _co = coroutine.running()  -- 获取正在运行的协程.
+    local _co = coroutine.running()   -- 获取正在运行(将要创建新线程)的协程.
+                                      -- 归还线程池时唤醒此协程.
     if not _co or coroutine.status(_co) == "dead" then
         error("Task must await in an alive async block.")  -- 协程需要有效.
     end
