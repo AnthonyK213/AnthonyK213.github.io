@@ -82,7 +82,7 @@ LuaJIT is a Just-In-Time Compilerfor the Lua programming language.
 [ext_ffi_tutorial](https://luajit.org/ext_ffi_tutorial.html)
 | Idiom                                                | C code                                   | Lua code                                                     |
 |------------------------------------------------------|------------------------------------------|--------------------------------------------------------------|
-| Pointer dereference<br/>int \*p;                     | x = \*p;<br\>\*p = y;                    | x = p[0]<br/>p[0] = y                                        |
+| Pointer dereference<br/>int \*p;                     | x = \*p;<br/>\*p = y;                    | x = p[0]<br/>p[0] = y                                        |
 | Pointer indexing<br/>int i, \*p;                     | x = p[i];<br/>p[i+1] = y;                | x = p[i]<br/>p[i+1] = y                                      |
 | Array indexing<br/>int i, a[];                       | x = a[i];<br/>a[i+1] = y;                | x = a[i]<br/>a[i+1] = y                                      |
 | struct/union dereference<br/>struct foo s;           | x = s.field;<br/>s.field = y;            | x = s.field<br/>s.field = y                                  |
