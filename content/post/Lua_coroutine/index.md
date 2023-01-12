@@ -1,7 +1,7 @@
 ---
 title: "Lua: 协程"
 date: 2022-10-20
-lastmod: 2022-10-23
+lastmod: 2023-01-13
 draft: false
 tags: ["Lua"]
 categories: ["Language"]
@@ -72,81 +72,83 @@ toc: false
 [实现](https://github.com/AnthonyK213/nvim/blob/master/lua/futures/task.lua)
 ``` lua
 ---@class 任务 任务对象.
----@field action function 需要异步执行的函数.
----@field callbacks function[] 回调函数队列, 接收异步执行结果为参数.
----@field varargs any[] 异步执行函数传入参数.
----@field status "Created"|"Running"|"RanToCompletion" 任务运行状态.
+---@field action function 异步执行的代码.
+---@field vararg any 入参.
 ---@field result any 异步执行结果.
+---@field continuation function 回调函数, 参数为异步执行结果.
+---@field is_completed boolean 任务是否完成.
 local Task = {}
 
 Task.__index = Task
 
 ---构造函数
----@param action function 需要异步执行的函数.
----@param ... any 异步执行函数传入参数.
----@return 任务 Task实例.
-function Task.new(action, ...)
+---@param action function 异步执行的代码.
+---@param vararg any 入参.
+---@return 任务 task Task实例.
+function Task.new(action, vararg)
     local task = {
-        action = action,
-        callbacks = {},
-        varargs = { ... },
-        status = "Created",
+        action = action;
+        vararg = vararg;
+        is_completed = false;
     }
     setmetatable(task, Task)
     return task
 end
 
----添加回调函数.
----@param callback function 回调函数.
-function Task:append_cb(callback)
-    table.insert(self.callbacks, callback)
-end
-
 ---运行任务.
----@return boolean ok 如果任务线程启动成功则True, 反之False.
+---@return boolean ok 如果任务启动成功则 `true`, 反之 `false`.
 function Task:start()
-    return vim.loop.new_work(self.action, vim.schedule_wrap(function(r)
-        for _, f in ipairs(self.callbacks) do  -- 执行队列中的回调函数.
-            if type(f) == "function" then
-                f(r)
-            end
-        end
-    end)):queue(unpack(self.varargs))
+    self.handle = vim.loop.new_work(self.action, vim.schedule_wrap(self.continuation))
+    return self.handle:queue(self.vararg)
 end
 
----等待任务完成.
+---异步等待任务完成.
 ---@return any result 任务运行结果.
 function Task:await()
-    local _co = coroutine.running()   -- 获取正在运行(将要创建新线程)的协程.
-                                      -- 归还线程池时唤醒此协程. 记为协程a
-    if not _co or coroutine.status(_co) == "dead" then
-        error("Task must await in an alive async block.")  -- 协程需要有效.
+    local co = coroutine.running()    -- 获取正在运行的协程.
+                                      -- 归还线程池时唤醒此协程. 记为协程a.
+    self.continuation = function(r)   -- 为任务添加回调函数(续延), 在结束时
+        self.result = r               -- 将结果写入result字段, 并切回
+        self.is_complete = true       -- 协程a, 继续执行协程a代码.
+        coroutine.resume(co)
     end
-    if self.status == "Created" then
-        self:append_cb(function(r)           -- 为任务添加回调函数, 在结束时
-            self.result = r                  -- 将结果赋予result字段, 并切回
-            self.status = "RanToCompletion"  -- 协程a, 继续执行协程a代码.
-            coroutine.resume(_co)
+
+    if self:start() then              -- 启动任务, 并挂起当前协程, 当前
+        coroutine.yield()             -- 任务让出对主线程的占用并在其它
+    end                               -- 线程运行. 任务完成时回调函数重
+                                      -- 新启动协程a.
+    return self.result
+end
+
+---阻塞等待任务完成.
+---@return any result 任务运行结果.
+function Task:wait()
+    self.continuation = function(r)
+        self.result = r
+        self.is_complete = true
+    end
+
+    if self:start() then
+        vim.wait(1e8, function()
+            return self.is_complete
         end)
-        if self:start() then                 -- 启动任务, 并挂起当前协程, 当前
-            self.status = "Running"          -- 任务让出对主线程的占用并在其它
-            coroutine.yield()                -- 线程运行. 任务完成时回调函数重
-            return self.result               -- 新启动协程a.
-        end
     end
+
+    return self.result
 end
 
 ---运行异步代码块.
 ---@param async_block function 异步代码块.
-local async = function(async_block)
-    local _co = coroutine.create(async_block)
-    coroutine.resume(_co)
+local spawn = function(async_block)
+    local co = coroutine.create(async_block)
+    coroutine.resume(co)
 end
 
---#region Test
-vim.cmd.messages("clear")
+--------------------------------------------------------------------------------
 
-local fibonacci = Task.new(function(n)
+vim.cmd.messages [[clear]]
+
+local fibonacci = function(n)
     local function fib(x)
         if x <= 2 then
             return 1
@@ -154,16 +156,18 @@ local fibonacci = Task.new(function(n)
             return fib(x - 1) + fib(x - 2)
         end
     end
-    return fib(n)
-end, 42)
 
-async(function()
+    return fib(n)
+end
+
+local fib_42 = Task.new(fibonacci, 42)
+
+spawn(function()
     print("Begin")                    -- 未运行至await, 打印 "Begin".
-    local result = fibonacci:await()  -- 协程挂起, 打印 "EOF".
+    local result = fib_42:await()     -- 协程挂起, 打印 "EOF".
     print(result)                     -- 协程切回, 打印 "267914296".
     print("End")                      -- 打印 "End", 异步代码块执行完成.
 end)
 
 print("EOF")
---#endregion
 ```

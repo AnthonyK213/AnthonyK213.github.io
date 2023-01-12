@@ -14,7 +14,7 @@ toc: true
 
 <style>
   :root {
-    /* font-size: 24px; */
+    font-size: 20px;
     font-family: "Courier New", "FangSong";
   }
 
@@ -76,7 +76,7 @@ toc: true
 # Asynchronous Programming Model
 > 异步编程模型
 
-* OS线程
+* 系统线程
 * 事件驱动
 * 协程
 * Actor
@@ -85,7 +85,7 @@ toc: true
 ---
 
 ## OS Thread
-> OS线程
+> 系统线程
 
 * 最简单, 最直接
 * 无需改变编程模型
@@ -616,6 +616,8 @@ toc: true
 * 语言:   `Lua`
 * 线程池: `libuv`赞助
 * 状态机: `coroutine`提供
+
+* 代码见: [async/await](https://anthonyk213.github.io/post/lua_coroutine/#asyncawait)
 
 ---
 
