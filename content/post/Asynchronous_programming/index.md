@@ -682,12 +682,32 @@ toc: true
 
 ---
 
-# Traps
+# Gotchas
 > 收集一下大家使用.NET异步编程遇到的坑
 
 ---
 
-## `async void ...`
+## `Task` is **HOT** and **ELUSIVE**
+> `Task`"热"且"难以捉摸"
+
+- `A -> B -> C`?
+  ``` cs
+  var task = F();
+  Console.WriteLine("A");
+  await task;
+  Console.WriteLine("C");
+  
+  async Task F()
+  {
+      Thread.Sleep(1000);
+      Console.WriteLine("B");
+      await Task.Delay(1000);
+  }
+  ```
+
+---
+
+## async void ...
 > 兜不住
 
 - 无法捕获其中的异常
@@ -711,6 +731,28 @@ toc: true
   ```
 
 * 一般用于异步事件处理
+
+---
+
+* async lambda
+  * `Func<Task>`委托 -> async Task ...
+    ``` cs
+    await F(async () => { await Task.Delay(1000); }); // 压力马斯内
+
+    async Task F(Func<Task> func)
+    {
+        await func();
+    }
+    ```
+  * `Action`委托 -> async void ...
+    ``` cs
+    F(async () => { await Task.Delay(1000); }); // 合法, 但不太合理
+
+    void F(Action action)
+    {
+        action();
+    }
+    ```
 
 ---
 
@@ -807,28 +849,28 @@ toc: true
 
 ---
 
-* 在`lock`中使用`await`?
-  > 这这不能
+## `await` inside `lock`?
+> 在`lock`中使用`await`?(这这不能)
 
 ---
 
-  * But... 异步锁(SemaphoreSlim)
-    > 其实就是限1个访问名额的信号量
-    ``` cs
-    SemaphoreSlim mutex = new SemaphoreSlim(1, 1);
+* But... 异步锁(SemaphoreSlim)
+  > 其实就是限1个访问名额的信号量
+  ``` cs
+  SemaphoreSlim mutex = new SemaphoreSlim(1, 1);
 
-    await mutex.WaitAsync();
+  await mutex.WaitAsync();
 
-    try
-    {
-      await Task.Delay(3000);
-    }
-    finally
-    {
-      mutex.Release();
-    }
-    ```
-    > [Rust的异步锁](https://docs.rs/tokio/latest/tokio/sync/struct.Mutex.html)
+  try
+  {
+    await Task.Delay(3000);
+  }
+  finally
+  {
+    mutex.Release();
+  }
+  ```
+  > [Rust的异步锁](https://docs.rs/tokio/latest/tokio/sync/struct.Mutex.html)
 
 ---
 
@@ -846,3 +888,4 @@ toc: true
 > 4. Lua设计与实现, codedump
 > 5. [walterlv](https://blog.walterlv.com/)
 > 6. [Rust Course](https://course.rs/about-book.html)
+> 7. [Asynchronous gotchas in C#](http://tomasp.net/blog/csharp-async-gotchas.aspx/)
