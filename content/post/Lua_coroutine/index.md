@@ -105,18 +105,18 @@ end
 ---异步等待任务完成.
 ---@return any result 任务运行结果.
 function Task:await()
-    local co = coroutine.running()    -- 获取正在运行的协程.
-                                      -- 归还线程池时唤醒此协程. 记为协程a.
+    local co = coroutine.running()    -- 获取正在运行的协程 `co`.
+
     self.continuation = function(r)   -- 为任务添加回调函数(续延), 在结束时
-        self.result = r               -- 将结果写入result字段, 并切回
-        self.is_complete = true       -- 协程a, 继续执行协程a代码.
+        self.result = r               -- 将结果写入 `result` 字段, 并切回
+        self.is_complete = true       -- 协程 `co`, 继续执行协程 `co` 代码.
         coroutine.resume(co)
     end
 
     if self:start() then              -- 启动任务, 并挂起当前协程, 当前
         coroutine.yield()             -- 任务让出对主线程的占用并在其它
     end                               -- 线程运行. 任务完成时回调函数重
-                                      -- 新启动协程a.
+                                      -- 新启动协程 `co`.
     return self.result
 end
 
@@ -164,8 +164,8 @@ local fib_42 = Task.new(fibonacci, 42)
 
 spawn(function()
     print("Begin")                    -- 未运行至await, 打印 "Begin".
-    local result = fib_42:await()     -- 协程挂起, 打印 "EOF".
-    print(result)                     -- 协程切回, 打印 "267914296".
+    local result = fib_42:await()     -- 任务挂起, 打印 "EOF".
+    print(result)                     -- 任务切回, 打印 "267914296".
     print("End")                      -- 打印 "End", 异步代码块执行完成.
 end)
 
