@@ -56,7 +56,7 @@ Console.WriteLine(i);
 定时器精度的问题了.
 
 [关于Windows定时器精度](https://et-framework.cn/d/245-windowssleep1), Windows
-默认设置为`15ms`(60Hz), Linux默认设置为`1ms`.
+默认设置为`15ms`(64Hz), Linux默认设置为`1ms`.
 
 详见[Windows Timer Resolution: The Great Rule Change](https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/)
 
