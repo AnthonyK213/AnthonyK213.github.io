@@ -687,10 +687,10 @@ toc: true
 
 ---
 
-## `Task` is **HOT** and **ELUSIVE**
-> `Task`"热"且"难以捉摸"
+## `Task` is **HOT**
+> `Task`很〇
 
-- `A -> B -> C`?
+- `A` -> `B` -> `C`?
   ``` cs
   var task = F();
   Console.WriteLine("A");
